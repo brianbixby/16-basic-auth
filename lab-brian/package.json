@@ -9,7 +9,8 @@
   "scripts": {
     "test": "DEBUG='16-basic-auth*' jest -i",
     "start": "DEBUG='16-basic-auth*' node server.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "coverage": "DEBUG='16-basic-auth*' jest --coverage"
   },
   "keywords": [],
   "author": "",
