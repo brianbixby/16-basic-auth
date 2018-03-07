@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema({
   findHash: { type: String, unique: true},
 });
 
+// creates password hash from old password
 userSchema.methods.generatePasswordHash = function(password) {
   debug('generate password hash');
 
@@ -26,6 +27,7 @@ userSchema.methods.generatePasswordHash = function(password) {
     });
   });
 };
+
 
 userSchema.methods.comparePasswordHash = function(password) {
   debug('comparePasswordHash');
@@ -39,6 +41,7 @@ userSchema.methods.comparePasswordHash = function(password) {
   });
 };
 
+// calling it with this object which is user that was instantiated
 userSchema.methods.generateFindHash = function() {
   debug('generateFindHash');
 
@@ -60,6 +63,7 @@ userSchema.methods.generateFindHash = function() {
   });
 };
 
+// this function calls generate find hash above
 userSchema.methods.generateToken = function() {
   debug('generateToken');
 

@@ -36,7 +36,6 @@ describe('Auth routes', function() {
           .send(exampleUser)
           .end((err, res) => {
             if (err) return done(err);
-            console.log('sign up token: ', res.text);
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
             done();
@@ -70,7 +69,6 @@ describe('Auth routes', function() {
             if(err) return done(err);
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
-            console.log('signin token: ', res.text);
             done();
           });
       });
