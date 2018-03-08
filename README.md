@@ -1,4 +1,4 @@
-![cf](https://i.imgur.com/7v5ASc8.png) Lab 16: Basic Authentication
+![cf](https://i.imgur.com/7v5ASc8.png) Lab 17: Bearer Authorization
 ======
 
 ## Submission Instructions
@@ -26,43 +26,49 @@ Configure the root of your repository with the following files and directories. 
 
 ## Feature Tasks
 ##### Minimum Requirements
-
-* create an HTTP server using `express`
-* using `mongoose`, create a **User** model with the following properties and options:
-  * `username` - *required and unique*
-  * `email` - *required and unique*
-  * `password` - *required - this must be hashed and can not stored as plain text*
-  * `findHash` - *unique*
-* use the **npm** `debug` module to log function calls that are used within your application
-* use the **express** `Router` to create a custom router for allowing users to **sign up** and **sign in**
-* use the **npm** `dotenv` module to house the following environment variables as part of your application:
-  * `PORT`
-  * `MONGODB_URI`
-  * `APP_SECRET` *(used for signing and verify tokens)*
+* create a new branch and use the same forked repository that you created yesterday
+* create a `bearer-auth-middleware` module (feel free to use the one from lecture as a reference point)
+* create a new resource that has at least three properties
+  * this resource must have a property of `userID` that references the `_id` of the user that created the resource
+* as always, use the **npm** `debug` module to log function calls that are used within your application
+* use the express `Router` to create routes for doing **RESTFUL CRUD** operations against your resource
 
 ## Server Endpoints
-##### `/api/signup`
+##### `/api/resource-name`
 * **POST** request
-  * should respond with a token (generated using `jwt`)
-  * should respond with **400 Bad Request** if the request failed
-  * should contain the username and password in the body of the request
+  * should pass data as stringifed JSON in the body of a **POST** request to create a new resource
 
-##### `/api/signin`
+##### `/api/resource-name/:id`
 * **GET** request
-* should respond with a token for authenticated users
-* should respond with **401 Unauthorized** for non-authenticated users
-* should contain the username and password using a `Basic:` authorization header
+  * should pass the id of a resource though the url endpoint to `req.params` to fetch a resource   
+* **PUT** request
+  * should pass data as stringifed JSON in the body of a put request to update a resource
+* **DELETE** request
+  * should pass the id of a resource though the url endpoint *(using `req.params`)* to delete a resource   
 
 ## Testing
-
-##### `/api/signup`
-* **POST** test **400**
-  * if no request body has been provided or the body is invalid
-* **POST** test **200**
-  * if the request body has been provided and is valid
-
-##### `/api/signin`
-* **GET** test **401**
-  * if the user could not be authenticated
+##### `/api/resource-name`
 * **GET** test **200**
-  * should respond with a token for a requests with a valid basic authorization header
+  * for requests made with a valid id
+* **GET** test **401**
+  * if no token was provided
+* **GET** test **404**
+  * for a valid request with an id that was not found
+* **PUT** test **200**
+  * for a post request with a valid body
+* **PUT** test **401**
+  * if no token was provided
+* **PUT** test **400**
+  * if the body was invalid
+* **PUT** test **404**
+  * for a valid request made with an id that was not found
+* **POST** test **200**
+  * for a request with a valid body
+* **POST** test **401**
+  * if no token was provided
+* **POST** test **400**
+  * if no body was provided or if the body was invalid
+* create a test to ensure that your API returns a status code of **404** for routes that have not been registered
+
+## Stretch Goals
+* **GET** request to `/api/resource-name` should return an array of all of the ids for that resource
