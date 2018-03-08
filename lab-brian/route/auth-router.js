@@ -2,6 +2,7 @@
 
 const jsonParser = require('body-parser').json();
 const debug = require('debug')('16-basic-auth:auth-router');
+const createError = require('http-errors');
 const Router = require('express').Router;
 const basicAuth = require('../lib/basic-auth-middleware.js');
 const User = require('../model/user.js');
@@ -10,6 +11,7 @@ const authRouter = module.exports = Router();
 
 authRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
+  if (!req.body.username || !req.body.email || !req.body.password) return next(createError(400, 'expected a request body username, email and password'));
 
   let password = req.body.password;
   delete req.body.password;

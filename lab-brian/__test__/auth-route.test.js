@@ -41,6 +41,19 @@ describe('Auth routes', function() {
             done();
           });
       });
+
+      it('should return a 400 error, no body', done => {
+        request.post(`${url}/api/signup`)
+          .send()
+          .set({
+            Authorization: `Bearer ${this.tempToken}`,
+          })
+          .end((err, res) => {
+            expect(res.status).toEqual(400);
+            done();
+          });
+      });
+  
     });
   });
 
@@ -69,6 +82,15 @@ describe('Auth routes', function() {
             if(err) return done(err);
             expect(res.status).toEqual(200);
             expect(typeof res.text).toEqual('string');
+            done();
+          });
+      });
+
+      it('should return a 401 when user cant be authenticated', done => {
+        request.get(`${url}/api/signin`)
+          .auth('')
+          .end((err, res) => {
+            expect(res.status).toEqual(401);
             done();
           });
       });
