@@ -2,7 +2,7 @@
 
 ## Lab 16: Basic Authentication
 
-I created an http server using Express and a user model utilizing Mongo. Users are able to query a local MongoDB to create users and retrieve a user's json web token.
+I created an http server using Express and 2 resource models utilizing Mongo and Mongoose. Users are able to query a local MongoDB to create and authenticate users and retrieve a user's list(s) if they are authenticated.
 
 ## Tech/frameworks/packages
 
@@ -37,36 +37,93 @@ Make POST/GET/DELETE/PUT requests to the server and your local MongoDB.
 
 ## Routes
 
-#### `POST /api/signup`
+#### `POST /api/signup && /api/list`
 
-Create a new  user with the properties `username`, `email`, `password` and `findHash` which is created for you.
+Create a new  user with the properties `username`, `email`, `password` and `findHash` which is created for you. Or create a new list with the properties `name`, `desc`, and `created` along with `userID` which are created for you.
 
 ```
 http POST :3000/api/signup username=briguy999 email=brianbixby0@gmail.com password=password1
+
+http POST :3000/api/list name='my cool list' desc='this list is so cool'
 ```
 
 Throws an error if any of the requested properties that are not created for you are missing.
 
-Will return a json web token if there are no errors.
+The User model will return a json web token and the list model will return a new list if there are no errors.
 
-#### `GET /api/signin`
+#### `GET /api/signin && /api/list/<list id>  && /api/lists`
 
-Retrieve the json web token for a created user.
+Retrieve the json web token for a created user, or retrieve a single list or all lists for an authenticated user.
 
 ```
 http -a <username>:<password> :3000/api/signin
+http -a <username>:<password> :3000/api/list/<list id>
+http -a <username>:<password> :3000/api/lists
 ```
+
+Throws an error if the route can't be found, the list id is invalid or the use is not authenticated.
+
+#### `DELETE /api/list/<list id>`
+
+Deletes a specific list as requested by the <list id>.
+
+```
+http -a <username>:<password> DELETE :3000/api/list/<list id>
+```
+
+If successful, a 204 status is returned.
+
+Throws an error if the request parameter (id) is missing or the user is not authenticated.
+
+
+#### `PUT /api/list/<list id>`
+
+Updates a Jlist with the properties `name`, `desc`, `created` and `userID` from your MongoDB as requested by the <list id>.
+
+```
+http -a <username>:<password> PUT :3000/api/list/<list id> name='new list name'
+```
+
+If successful, the list is returned with a 200 status.
+
+If a request is made with a list id that is not found, a 404 status is returned.
+
+If a request is made with no list id a 400 status is returned.
+
+If a request is made with out an authenticated user a 401 status is returned.
+
 ## Tests
 
-run `jest` to check tests.
+run `npm run tests` to check tests.
 
 #### POST
 
-1. should return the  json web token and a 200 status code if there is no error.
+1. The User model should create and return s json web token and a 200 status code if there is no error.
+2. The List model should create and return a new list.
+3. Both should respond with a 400 status code if there is no request body.
+4. The List model should respond with a 401 status code if there is no json web token provided.
 
 #### GET
 
-1. should return the menu object and a 200 status code if there is no error.
+1. The User model should return a user's json web token and a 200 status code if there is no error.
+2. The list model should return a user's list and a 200 status code if there is no error.
+3. The List model should respond with a 401 status code if there is no json web token provided
+4. should respond with a 404 status code if a request is made with an id that is not found.
+5. The List model should respond with a 200 status code and all lists if there is no parameter (id).
+
+#### DELETE
+
+1. The List model should return a 204 status code if there are no errors.
+2. The List model should respond with a 400 status code if there is no parameter (id).
+3. The List model should respond with a 404 status code if a request is made with an id that is not found.
+4. The List model should respond with a 401 status code if there is no json web token provided.
+
+#### PUT
+
+1. The List model should update and return the updated list along with a 200 status code if there are no errors.
+2. The List model should respond with a 400 status code if there is an invalid request body.
+3. The List model should respond with a 404 status code if a request is made with an id that is not found.
+4. The List model should respond with a 401 status code if there is no json web token provided.
 
 ## Contribute
 
