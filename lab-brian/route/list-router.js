@@ -37,6 +37,7 @@ listRouter.get('/api/lists', bearerAuth, function(req, res, next) {
 
 listRouter.put('/api/list/:listId', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT: /api/list:listId');
+  if (!req.body.name || !req.body.desc) return next(createError(400, 'expected a request body name or desc'));
 
   List.findByIdAndUpdate(req.params.listId, req.body, {new: true})
     .then( list => res.json(list))
