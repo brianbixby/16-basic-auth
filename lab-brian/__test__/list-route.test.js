@@ -8,7 +8,7 @@ const User = require('../model/user.js');
 const List = require('../model/list.js');
 
 require('jest');
-const url = `http://localhost:${process.env.PORT}`;
+const url = 'http://localhost:3000';
 
 const exampleUser = { username: 'exampleuser', password: '1234', email: 'exampleuser@test.com' };
 const exampleList = { name: 'test list', desc: 'test list desc' };
