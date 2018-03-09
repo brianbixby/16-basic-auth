@@ -33,12 +33,43 @@ describe('Photo Routes', function() {
   beforeAll( done => {
     serverToggle.serverOn(server, done);
   });
+
+  beforeAll( done => {
+    new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+  });
+
+  // separate before each's because they are separate concerns 
+  beforeAll( done => {
+    exampleList.userID = this.tempUser._id.toString();
+    new List(exampleList).save()
+      .then( list => {
+        this.tempList = list;
+        done();
+      })
+      .catch(done);
+  });
+  
+  afterAll( done => {
+    delete exampleList.userID;
+    done();
+  });
   
   afterAll( done => {
     serverToggle.serverOff(server, done);
   });
 
-  afterEach( done => {
+  afterAll( done => {
     Promise.all([
       Photo.remove({}),
       User.remove({}),
@@ -48,38 +79,8 @@ describe('Photo Routes', function() {
       .catch(done);
   });
 
-  describe('POST: /api/list/:listID/photo', function() {
-    describe('with a valid token and valid data', function() {
-      beforeEach( done => {
-        new User(exampleUser)
-          .generatePasswordHash(exampleUser.password)
-          .then( user => user.save())
-          .then( user => {
-            this.tempUser = user;
-            return user.generateToken();
-          })
-          .then( token => {
-            this.tempToken = token;
-            done();
-          })
-          .catch(done);
-      });
-
-      // separate before each's because they are separate concerns 
-      beforeEach( done => {
-        exampleList.userID = this.tempUser._id.toString();
-        new List(exampleList).save()
-          .then( list => {
-            this.tempList = list;
-            done();
-          })
-          .catch(done);
-      });
-      
-      afterEach( done => {
-        delete exampleList.userID;
-        done();
-      });
+  describe('POST: /api/list/:listID/photo', () => {
+    describe('with a valid token and valid data', () => {
 
       it('should return a object containing our photo url', done => {
         request.post(`${url}/api/list/${this.tempList._id}/photo`)
@@ -91,14 +92,29 @@ describe('Photo Routes', function() {
           .attach('image', examplePhoto.image)
           .end((err, res) => {
             if (err) return done(err);
+            this.tempPhoto = res.body;
+            console.log('this.tempPhoto: ', this.tempPhoto);
             expect(res.status).toEqual(200);
             expect(res.body.name).toEqual(examplePhoto.name);
             expect(res.body.desc).toEqual(examplePhoto.desc);
             expect(res.body.listID).toEqual(this.tempList._id.toString());
             done();
-          // expect(typeof res.body.imageURI).toEqual('string');
           });
       });
+    });
+  });
+
+  describe('DELETE: /api/photo:photoID', () => {
+    it('should delete a photo and return a 204 status', done => {
+      request.delete(`${url}/api/photo/${this.tempPhoto._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`,
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          expect(res.status).toEqual(204);
+          done();
+        });
     });
   });
 }); 

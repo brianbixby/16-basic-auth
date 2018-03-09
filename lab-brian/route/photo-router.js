@@ -24,7 +24,7 @@ AWS.config.setPromisesDependency(require('bluebird'));
 
 const s3 = new AWS.S3();
 // instantiates new s3 module object which has a bunch of methods on it
-console.log('s3: ', s3);
+// console.log('s3: ', s3);
 
 const dataDir = `${__dirname}/../data`;
 // will have file ready to be uploaded for our app; but we need a file in our file system
@@ -38,8 +38,24 @@ function s3uploadProm(params) {
     s3.upload(params, (err, s3data) => {
       // s3 gives us access to uploade method
       // if(err) reject(err);
-      console.log('s3data: ', s3data);
+      // console.log('s3data: ', s3data);
       resolve(s3data);
+    });
+  });
+}
+
+function s3deleteProm(params) {
+  debug('s3deleteProm');
+
+  console.log(params);
+  return new Promise((resolve, reject) => {
+    s3.deleteObject(params, (err, res) => {
+      if(err) {
+        debug('delete error: ', err, err.stack);
+        return reject(err);
+      }
+      debug('delete successs: ', res);  
+      return resolve(res);
     });
   });
 }
@@ -74,7 +90,7 @@ photoRouter.post('/api/list/:listID/photo', bearerAuth, upload.single('image'), 
   List.findById(req.params.listID)
     .then( () => s3uploadProm(params))
     .then( s3data => {
-      console.log('s3 response: ', s3data);
+      // console.log('s3 response: ', s3data);
       del([`${dataDir}/*`]);
 
       let photoData = {
@@ -89,5 +105,25 @@ photoRouter.post('/api/list/:listID/photo', bearerAuth, upload.single('image'), 
       return new Photo(photoData).save();
     })
     .then( photo => res.json(photo))
+    .catch( err => next(err));
+});
+
+photoRouter.delete('/api/photo/:photoID', bearerAuth, function(req, res, next) {
+  debug('DELETE: /api/photo/:photoID');
+
+  let params = {
+    Bucket: process.env.AWS_BUCKET,
+    Key: '',
+  };
+
+  Photo.findById(req.params.photoID)
+    .then( photo => {
+      console.log('params: ', params);
+      console.log(req.params.photoID);
+      params.Key = photo.objectKey;
+      return s3deleteProm(params);
+    })
+    .then( () => Photo.findByIdAndRemove(req.params.photoID))
+    .then( () => res.status(204).send())
     .catch( err => next(err));
 });
