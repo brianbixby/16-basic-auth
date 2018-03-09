@@ -1,8 +1,8 @@
 # Code Fellows: Code 401d22: Full-Stack JavaScript
 
-## Lab 16: Basic Authentication
+## Lab 18: Asset Management
 
-I created an http server using Express and 2 resource models utilizing Mongo and Mongoose. Users are able to query a local MongoDB to create and authenticate users and retrieve a user's list(s) if they are authenticated.
+I added additional functionality to my 2 resource API, I have incorporated Amazon S3 so users can upload images to Amazon S3 and my database savesa  URL pointing to the site.
 
 ## Tech/frameworks/packages
 

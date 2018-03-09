@@ -1,9 +1,8 @@
-![cf](https://i.imgur.com/7v5ASc8.png) Lab 17: Bearer Authorization
+![cf](https://i.imgur.com/7v5ASc8.png) Lab 18: Asset Management
 ======
 
 ## Submission Instructions
-* Work in a fork of this repository
-* Work in a branch on your fork
+* Continue to work off of the repository you forked on Monday
 * Write all of your code in a directory named `lab-` + `<your name>` **e.g.** `lab-susan`
 * Open a pull request to this repository
 * Submit on canvas a question and observation, how long you spent, and a link to your pull request
@@ -26,49 +25,36 @@ Configure the root of your repository with the following files and directories. 
 
 ## Feature Tasks
 ##### Minimum Requirements
-* create a new branch and use the same forked repository that you created yesterday
-* create a `bearer-auth-middleware` module (feel free to use the one from lecture as a reference point)
-* create a new resource that has at least three properties
-  * this resource must have a property of `userID` that references the `_id` of the user that created the resource
-* as always, use the **npm** `debug` module to log function calls that are used within your application
-* use the express `Router` to create routes for doing **RESTFUL CRUD** operations against your resource
+* create an AWS account
+* create an AWS Access Key and Secret
+  * add the Access Key and Secret to your `.env` file
+* create a new model that represents a file type that you want to store on AWS S3
+  * ex: `.mp3`, `.mp4`, `.png`, etc
+* create a test that uploads one of these files through a route
+* use the `aws-sdk` module to assist with file uploading
+* use `multer` to parse the file upload request
 
 ## Server Endpoints
-##### `/api/resource-name`
+##### `/api/resource/:resourceID/new-resource`
 * **POST** request
   * should pass data as stringifed JSON in the body of a **POST** request to create a new resource
 
-##### `/api/resource-name/:id`
-* **GET** request
-  * should pass the id of a resource though the url endpoint to `req.params` to fetch a resource   
-* **PUT** request
-  * should pass data as stringifed JSON in the body of a put request to update a resource
-* **DELETE** request
-  * should pass the id of a resource though the url endpoint *(using `req.params`)* to delete a resource   
-
 ## Testing
-##### `/api/resource-name`
-* **GET** test **200**
-  * for requests made with a valid id
-* **GET** test **401**
-  * if no token was provided
-* **GET** test **404**
-  * for a valid request with an id that was not found
-* **PUT** test **200**
-  * for a post request with a valid body
-* **PUT** test **401**
-  * if no token was provided
-* **PUT** test **400**
-  * if the body was invalid
-* **PUT** test **404**
-  * for a valid request made with an id that was not found
+##### `/api/resource/:resourceID/new-resource`
 * **POST** test **200**
   * for a request with a valid body
-* **POST** test **401**
-  * if no token was provided
-* **POST** test **400**
-  * if no body was provided or if the body was invalid
-* create a test to ensure that your API returns a status code of **404** for routes that have not been registered
+  * test to ensure that you have received a CDN URL from S3 that contains a link to your uploaded asset
 
-## Stretch Goals
-* **GET** request to `/api/resource-name` should return an array of all of the ids for that resource
+## Stretch Goal
+Create a **DELETE** route and related test that uses the `deleteObject` method (provided by the `aws-sdk` module) to delete a file from S3. You'll want to pass in a `params` object that contains a "bucket" and an "AWS object key" in order to delete the object from s3.
+
+For example:
+
+``` javascript
+var params = {
+  Bucket: 's3-bucket-name',
+  Key: 'object-filename'
+}
+
+s3.deleteObject(params)
+```
