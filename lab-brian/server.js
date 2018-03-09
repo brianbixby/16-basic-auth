@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const cors = require('cors');
 
 const listRouter = require('./route/list-router.js');
+const photoRouter = require('./route/photo-router.js');
 const authRouter = require('./route/auth-router.js');
 const errors = require('./lib/error-middleware.js');
 dotenv.load();
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(morgan('dev'));
 app.use(authRouter);
 app.use(listRouter);
+app.use(photoRouter);
 app.use(errors);
 
 const server = module.exports = app.listen(PORT, () => {
